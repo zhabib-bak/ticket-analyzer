@@ -7,11 +7,13 @@ import https from "node:https";
 const router = Router();
 
 const AI_MODELS = [
-  "google/gemma-3-27b-it:free",
   "meta-llama/llama-3.3-70b-instruct:free",
-  "google/gemma-3-12b-it:free",
-  "mistralai/mistral-7b-instruct:free",
-  "qwen/qwen3-8b:free",
+  "google/gemma-4-31b-it:free",
+  "google/gemma-4-26b-a4b-it:free",
+  "qwen/qwen3-coder:free",
+  "deepseek/deepseek-v4-flash:free",
+  "openai/gpt-oss-20b:free",
+  "meta-llama/llama-3.2-3b-instruct:free",
 ];
 
 async function callOpenRouter(model: string, messages: { role: string; content: string }[], maxTokens = 1200): Promise<string> {
