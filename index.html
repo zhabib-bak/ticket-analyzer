@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ticket Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-card">
+      <div class="login-logo">📊</div>
+      <h1>Ticket Analyzer</h1>
+      <p class="login-sub">Análisis de tickets con IA</p>
+      <form id="login-form">
+        <input type="text" id="login-user" placeholder="Usuario" autocomplete="username" required />
+        <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" required />
+        <button type="submit">Entrar</button>
+        <p id="login-error" class="error-msg hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="hidden">
+    <nav class="navbar">
+      <div class="nav-brand">📊 Ticket Analyzer</div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="uploads">Uploads</button>
+        <button class="nav-tab" data-tab="dashboard">Dashboard</button>
+        <button class="nav-tab" data-tab="ai">Chat IA</button>
+      </div>
+      <div class="nav-right">
+        <span id="nav-user" class="nav-user"></span>
+        <button id="btn-logout" class="btn-ghost">Salir</button>
+      </div>
+    </nav>
+
+    <!-- UPLOADS TAB -->
+    <div id="tab-uploads" class="tab-content active">
+      <div class="page-header">
+        <div>
+          <h2>Archivos CSV</h2>
+          <p class="subtitle">Sube tu Excel exportado como CSV para analizarlo</p>
+        </div>
+        <button id="btn-open-upload" class="btn-primary">+ Subir CSV</button>
+      </div>
+
+      <div id="uploads-list" class="uploads-grid"></div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p class="subtitle">Métricas agregadas de todos los uploads</p>
+        </div>
+        <div class="dashboard-controls">
+          <select id="dash-upload-filter">
+            <option value="">Todos los uploads</option>
+          </select>
+          <button id="btn-export-csv" class="btn-secondary">⬇ Exportar CSV</button>
+        </div>
+      </div>
+      <div id="dash-total" class="stat-banner"></div>
+      <div class="charts-grid">
+        <div class="chart-card"><h3>Por Categoría</h3><canvas id="chart-category"></canvas></div>
+        <div class="chart-card"><h3>Por Prioridad</h3><canvas id="chart-priority"></canvas></div>
+        <div class="chart-card"><h3>Por Estado</h3><canvas id="chart-status"></canvas></div>
+        <div class="chart-card"><h3>Top Asignados</h3><canvas id="chart-assignee"></canvas></div>
+        <div class="chart-card chart-wide"><h3>Tickets por Semana</h3><canvas id="chart-week"></canvas></div>
+      </div>
+    </div>
+
+    <!-- AI CHAT TAB -->
+    <div id="tab-ai" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h2>Chat con IA</h2>
+          <p class="subtitle">Haz preguntas en lenguaje natural sobre tus tickets</p>
+        </div>
+        <select id="ai-upload-filter">
+          <option value="">Todos los uploads</option>
+        </select>
+      </div>
+      <div class="ai-wrapper">
+        <div id="ai-messages" class="ai-messages">
+          <div class="ai-msg ai">
+            <div class="ai-avatar">🤖</div>
+            <div class="ai-bubble">¡Hola! Soy tu analista de tickets con IA. Puedo responder preguntas sobre tus datos cargados. Prueba con alguna sugerencia o escribe tu propia pregunta.</div>
+          </div>
+        </div>
+        <div class="ai-suggestions">
+          <button class="suggestion-chip" data-q="¿Cuál es la categoría con más tickets?">Categoría top</button>
+          <button class="suggestion-chip" data-q="¿Quién tiene más tickets asignados?">Mayor carga</button>
+          <button class="suggestion-chip" data-q="¿Cuántos tickets están sin resolver?">Sin resolver</button>
+          <button class="suggestion-chip" data-q="¿Cuáles son los problemas que más se repiten?">Problemas frecuentes</button>
+          <button class="suggestion-chip" data-q="Dame un resumen ejecutivo de los tickets">Resumen ejecutivo</button>
+          <button class="suggestion-chip" data-q="¿Qué tendencias ves en los datos?">Tendencias</button>
+        </div>
+        <div class="ai-input-row">
+          <input id="ai-input" type="text" placeholder="Pregunta algo sobre tus tickets..." />
+          <button id="ai-send" class="btn-primary">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODAL -->
+  <div id="upload-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Subir CSV</h3>
+        <button class="modal-close" id="btn-close-modal">✕</button>
+      </div>
+      <div id="upload-step-file" class="upload-step">
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-icon">📂</div>
+          <p>Arrastra tu CSV aquí o haz clic</p>
+          <p class="drop-sub">Excel exportado como CSV — máx 50 MB</p>
+          <input type="file" id="file-input" accept=".csv,.txt" class="hidden" />
+        </div>
+        <div class="upload-meta">
+          <input type="text" id="upload-week" placeholder="Semana (ej: 2026-W21)" />
+          <input type="text" id="upload-notes" placeholder="Notas opcionales" />
+        </div>
+        <div id="upload-error" class="error-msg hidden"></div>
+      </div>
+
+      <div id="upload-step-map" class="upload-step hidden">
+        <p class="map-intro">El archivo tiene <strong id="map-row-count"></strong> filas. Mapea las columnas a los campos estándar:</p>
+        <div id="mapping-grid" class="mapping-grid"></div>
+        <div id="map-error" class="error-msg hidden"></div>
+      </div>
+
+      <div id="upload-step-done" class="upload-step hidden">
+        <div class="done-icon">✅</div>
+        <h3 id="done-msg"></h3>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-upload-next" class="btn-primary">Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
