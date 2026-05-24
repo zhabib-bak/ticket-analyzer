@@ -1,0 +1,16 @@
+{
+  "name": "ticket-analyzer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "CSV ticket bulk analyzer with AI chat and dashboards",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3",
+    "busboy": "^1.6.0",
+    "csv-parse": "^5.5.6"
+  }
+}
