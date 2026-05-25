@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs_22", "nodePackages.pnpm"]
+nixPkgs = ["nodejs_22"]
 
 [phases.install]
-cmds = ["pnpm install --no-frozen-lockfile"]
+cmds = ["npm install busboy csv-parse pg"]
 
 [phases.build]
-cmds = ["pnpm run build"]
+cmds = []
 
 [start]
 cmd = "node server.mjs"
