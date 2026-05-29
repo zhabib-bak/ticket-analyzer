@@ -1,0 +1,28 @@
+:root {
+  --bg: #0A0A0C;
+  --bg-elevated: #111113;
+  --accent: #6366F1;
+  --accent-light: #818CF8;
+  --text-primary: #F8F8FA;
+  --text-secondary: #A1A1AA;
+  --success: #22C173;
+  --warning: #F59E0B;
+  --critical: #EF4444;
+  --radius: 14px;
+}
+
+.glass {
+  background: rgba(17, 17, 19, 0.85);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.premium-card {
+  transition: all 0.4s cubic-bezier(0.23, 1.0, 0.32, 1);
+}
+
+.premium-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+  border-color: rgba(99, 102, 241, 0.25);
+}
