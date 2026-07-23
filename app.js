@@ -380,9 +380,10 @@ function appendMsg(role, text, extraClass = '') {
   const msgs = document.getElementById('ai-messages');
   const div = document.createElement('div');
   div.className = `ai-msg ${role}${extraClass ? ' ' + extraClass : ''}`;
+  const formatted = esc(text).replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   div.innerHTML = `
     <div class="ai-avatar">${role === 'user' ? '👤' : '🤖'}</div>
-    <div class="ai-bubble">${text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+    <div class="ai-bubble">${formatted}</div>
   `;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;

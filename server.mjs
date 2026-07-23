@@ -21,9 +21,18 @@ const SESSION_HRS  = parseInt(process.env.SESSION_HOURS || '12', 10);
 const MAX_BODY     = 50 * 1024 * 1024;
 
 // ── Postgres pool ─────────────────────────────────────────────────────────────
+function buildSslConfig() {
+  const url = process.env.DATABASE_URL || '';
+  // The Railway internal network is private and does not use TLS.
+  if (url.includes('railway.internal')) return false;
+  // Verify the server certificate by default. Provide DATABASE_CA_CERT to pin a
+  // custom CA, or set DATABASE_SSL_REJECT_UNAUTHORIZED=false to opt out (unsafe).
+  if (process.env.DATABASE_CA_CERT) return { ca: process.env.DATABASE_CA_CERT, rejectUnauthorized: true };
+  return { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false' };
+}
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('railway.internal') ? false : { rejectUnauthorized: false },
+  ssl: buildSslConfig(),
   max: 10,
 });
 
@@ -170,11 +179,11 @@ async function serveStatic(reqPath, res) {
 
 // ── AI helpers ────────────────────────────────────────────────────────────────
 const AI_MODELS = [
+  'openai/gpt-oss-20b:free',
   'google/gemma-4-31b-it:free',
   'google/gemma-4-26b-a4b-it:free',
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'minimax/minimax-m2.5:free',
   'nvidia/nemotron-3-super-120b-a12b:free',
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
 ];
 async function callOpenRouter(apiKey, model, messages, maxTokens) {
   const { request: httpsReq } = await import('node:https');
